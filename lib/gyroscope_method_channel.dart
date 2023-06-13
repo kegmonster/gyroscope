@@ -14,4 +14,10 @@ class MethodChannelGyroscope extends GyroscopePlatform {
     final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
+
+  @override
+  Future<bool?> subscribe() async{
+    final subscribed = await methodChannel.invokeMethod<bool>('subscribe');
+    return subscribed;
+  }
 }

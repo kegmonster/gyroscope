@@ -26,4 +26,8 @@ abstract class GyroscopePlatform extends PlatformInterface {
   Future<String?> getPlatformVersion() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
+
+  Future<bool?> subscribe() {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
 }
