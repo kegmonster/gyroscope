@@ -10,6 +10,12 @@ class MockGyroscopePlatform
 
   @override
   Future<String?> getPlatformVersion() => Future.value('42');
+
+  @override
+  Future<void> subscribe() {
+    // TODO: implement subscribe
+    throw UnimplementedError();
+  }
 }
 
 void main() {

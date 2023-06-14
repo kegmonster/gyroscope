@@ -12,16 +12,14 @@ public class GyroscopeHandler implements SensorEventListener{
     private Sensor gyroscopeSensor;
     private EventChannel.EventSink eventSink;
 
-
     public GyroscopeHandler(Context context){
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-
     }
 
-    public void startListening(EventChannel.EventSink eventSink) {
+    public void startListening(EventChannel.EventSink eventSink, int period) {
         this.eventSink = eventSink;
-        sensorManager.registerListener(this, gyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, gyroscopeSensor, period);
     }
 
     public void stopListening() {

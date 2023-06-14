@@ -1,3 +1,4 @@
+import 'package:gyroscope/gyroscope.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'gyroscope_method_channel.dart';
@@ -27,7 +28,10 @@ abstract class GyroscopePlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<bool?> subscribe() {
+  Future<void> subscribe(SampleRate rate) {
+    throw UnimplementedError('platformVersion() has not been implemented.');
+  }
+  Future<void> unsubscribe() {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 }

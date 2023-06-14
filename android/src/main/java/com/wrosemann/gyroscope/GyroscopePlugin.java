@@ -2,6 +2,7 @@ package com.wrosemann.gyroscope;
 
 import android.app.Application;
 import android.content.Context;
+import android.hardware.SensorManager;
 
 import androidx.annotation.NonNull;
 
@@ -32,8 +33,7 @@ public class GyroscopePlugin implements FlutterPlugin, MethodCallHandler, EventC
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
     channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "gyroscope");
     channel.setMethodCallHandler(this);
-    eventChannel = new EventChannel(flutterPluginBinding.getBinaryMessenger(), "your_event_channel_name");
-    eventChannel.setStreamHandler(this);
+    registerEventChannel(flutterPluginBinding.getBinaryMessenger());
     context = flutterPluginBinding.getApplicationContext();
   }
 
@@ -41,21 +41,20 @@ public class GyroscopePlugin implements FlutterPlugin, MethodCallHandler, EventC
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     if (call.method.equals("getPlatformVersion")) {
       result.success("Android " + android.os.Build.VERSION.RELEASE);
-
     } else if (call.method.equals("subscribe")) {
-      startGyroscopeListening(eventSink);
+      int period = call.argument("rate");
+      startGyroscopeListening(eventSink, period * 1000000);
     } else if (call.method.equals("unsubscribe")) {
       stopGyroscopeListening();
     } else {
-
       result.notImplemented();
     }
   }
 
   // Method to start listening to gyroscope sensor events
-  public void startGyroscopeListening(EventChannel.EventSink eventSink) {
+  public void startGyroscopeListening(EventChannel.EventSink eventSink, int period) {
     gyroscopeHandler = new GyroscopeHandler(context);
-    gyroscopeHandler.startListening(eventSink);
+    gyroscopeHandler.startListening(eventSink, period);
   }
 
   // Method to stop listening to gyroscope sensor events
@@ -75,10 +74,12 @@ public class GyroscopePlugin implements FlutterPlugin, MethodCallHandler, EventC
     channel.setMethodCallHandler(null);
   }
   // Method to register the EventChannel
+
   public void registerEventChannel(BinaryMessenger messenger) {
-    eventChannel = new EventChannel(messenger, "your_event_channel_name");
+    eventChannel = new EventChannel(messenger, "gyro_update_channel");
     eventChannel.setStreamHandler(this);
   }
+
   @Override
   public void onListen(Object arguments, EventChannel.EventSink events) {
     setEventSink(events);

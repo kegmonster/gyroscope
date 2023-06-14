@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:gyroscope/gyroscope.dart';
 
 import 'gyroscope_platform_interface.dart';
 
@@ -16,8 +17,13 @@ class MethodChannelGyroscope extends GyroscopePlatform {
   }
 
   @override
-  Future<bool?> subscribe() async{
-    final subscribed = await methodChannel.invokeMethod<bool>('subscribe');
-    return subscribed;
+  Future<void> subscribe(SampleRate rate) async{
+    await methodChannel.invokeMethod<void>('subscribe',{'rate':rate.toHz()});
+  }
+
+  @override
+  Future<void> unsubscribe() async{
+    await methodChannel.invokeMethod<void>('unsubscribe');
+
   }
 }
