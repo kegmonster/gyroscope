@@ -42,8 +42,8 @@ public class GyroscopePlugin implements FlutterPlugin, MethodCallHandler, EventC
     if (call.method.equals("getPlatformVersion")) {
       result.success("Android " + android.os.Build.VERSION.RELEASE);
     } else if (call.method.equals("subscribe")) {
-      int period = call.argument("rate");
-      startGyroscopeListening(eventSink, period * 1000000);
+      double rate = (int)call.argument("rate");
+      startGyroscopeListening(eventSink, (int)((1.0/rate)* 1000000));
     } else if (call.method.equals("unsubscribe")) {
       stopGyroscopeListening();
     } else {

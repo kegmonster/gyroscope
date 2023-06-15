@@ -8,12 +8,15 @@ import 'gyroscope_sensor_interface.dart';
 class GyroscopeSensorImpl implements GyroscopeSensorInterface {
 
   final EventChannel _eventChannel = const EventChannel('gyro_update_channel');
-  StreamSubscription<dynamic>? _streamSubscription;
+ // StreamSubscription<dynamic>? _streamSubscription;
   GyroscopeSensorSubscription? subscription;
+
+  GyroscopeSensorImpl(){
+    startListeningToGyroscopeData();
+  }
 
   @override
   Future<void> subscribe(GyroscopeSensorSubscription subscription, {required SampleRate rate,}) async {
-    startListeningToGyroscopeData();
     this.subscription = subscription;
     return GyroscopePlatform.instance.subscribe(rate);
   }
@@ -36,7 +39,7 @@ class GyroscopeSensorImpl implements GyroscopeSensorInterface {
   }
 
   void stopListeningToGyroscope(){
-    _streamSubscription?.cancel();
+
   }
 
 }

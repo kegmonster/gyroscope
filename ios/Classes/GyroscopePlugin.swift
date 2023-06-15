@@ -1,58 +1,49 @@
 import Flutter
 import UIKit
-import SensingKit
 
-public class GyroscopePlugin: NSObject, FlutterPlugin {
+public class GyroscopePlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
     
-    private var sensingKit: SensingKitLib?
-  public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "gyroscope", binaryMessenger: registrar.messenger())
-    let instance = GyroscopePlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
- 
-  }
-
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    switch call.method {
-    case "getPlatformVersion":
-      result("iOS " + UIDevice.current.systemVersion)
-        test()
-    default:
-      result(FlutterMethodNotImplemented)
-    }
-  }
+    private var gyroscopeHandler: GyroscopeHandler = GyroscopeHandler()
+    private var eventSink : FlutterEventSink?
     
-    public func test(){
-        sensingKit = SensingKitLib.shared()
-        do{
-            try  sensingKit?.register(SKSensorType.Gyroscope)
-            try sensingKit?.subscribe(to: SKSensorType.Gyroscope, withHandler: { (sensorType, sensorData, error) in
-
-                   if (error == nil) {
-                       let gyro = sensorData as! SKGyroscopeData
-                       print("b: \(gyro.csvString)")
-                       do {
-                           try self.sensingKit?.stopContinuousSensing(with:SKSensorType.Gyroscope)
-                       }
-                       catch {
-                           // Handle error
-                       }
-                   }
-                
-               })
-        }
-        catch {
-            // Handle error
-        }
-        // Start
-        do {
-            try sensingKit?.startContinuousSensing(with:SKSensorType.Gyroscope)
-        }
-        catch {
-            // Handle error
-        }
-
-        // Stop
+    public static func register(with registrar: FlutterPluginRegistrar) {
+        let channel = FlutterMethodChannel(name: "gyroscope", binaryMessenger: registrar.messenger())
+        let instance = GyroscopePlugin()
+        registrar.addMethodCallDelegate(instance, channel: channel)
         
+        let eventChannel = FlutterEventChannel(name: "gyro_update_channel", binaryMessenger: registrar.messenger())
+        eventChannel.setStreamHandler(instance)
     }
+    
+    
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        switch call.method {
+        case "getPlatformVersion":
+            result("iOS " + UIDevice.current.systemVersion)
+            break
+        case "subscribe":
+            let rate = (call.arguments as! [String:Any])["rate"]
+            if (eventSink != nil){
+                gyroscopeHandler.startListening(rate: rate as! UInt, eventSink: eventSink!)
+            }
+            break
+        case "unsubscribe":
+            gyroscopeHandler.stopListening()
+            break
+        default:
+            result(FlutterMethodNotImplemented)
+        }
+    }
+    
+    public func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        self.eventSink = events
+        return nil
+    }
+    
+    public func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        eventSink = nil
+        return nil
+    }
+    
+    
 }
