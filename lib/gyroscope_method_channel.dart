@@ -18,12 +18,18 @@ class MethodChannelGyroscope extends GyroscopePlatform {
 
   @override
   Future<void> subscribe(SampleRate rate) async{
-    await methodChannel.invokeMethod<void>('subscribe',{'rate':rate.toHz()});
+    bool? success = await methodChannel.invokeMethod<bool>('subscribe',{'rate':rate.toHz()});
+    if (success == null || !success) {
+      throw SensorException();
+    }
   }
 
   @override
   Future<void> unsubscribe() async{
-    await methodChannel.invokeMethod<void>('unsubscribe');
+    bool? success = await methodChannel.invokeMethod<bool>('unsubscribe');
+    if (success == null || !success){
+      throw SensorException();
+    }
 
   }
 }

@@ -14,7 +14,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool subscribed = false;
-  final gyrosensor = GyroscopeSensorImpl();
+  final gyroSensor = GyroscopeSensorImpl();
   GyroscopeData lastUpdate = const GyroscopeData(azimuth: 0, pitch: 0, roll: 0);
 
   @override
@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
           child: Text(subscribed ? 'unsubscribe' : 'subscribe'),
           onPressed: (){
             if(!subscribed) {
-              gyrosensor.subscribe((data) {
+              gyroSensor.subscribe((data) {
                 setState(() {
                   lastUpdate = data;
                 });
@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> {
                 subscribed = true;
               });
             }else{
-              gyrosensor.unsubscribe();
+              gyroSensor.unsubscribe();
               setState(() {
                 subscribed = false;
               });

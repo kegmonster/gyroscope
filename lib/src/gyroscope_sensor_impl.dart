@@ -8,38 +8,43 @@ import 'gyroscope_sensor_interface.dart';
 class GyroscopeSensorImpl implements GyroscopeSensorInterface {
 
   final EventChannel _eventChannel = const EventChannel('gyro_update_channel');
- // StreamSubscription<dynamic>? _streamSubscription;
-  GyroscopeSensorSubscription? subscription;
+  StreamSubscription<dynamic>? _streamSubscription;
+  GyroscopeSensorSubscription? _subscription;
 
   GyroscopeSensorImpl(){
-    startListeningToGyroscopeData();
+    setupEventChannel();
   }
 
   @override
   Future<void> subscribe(GyroscopeSensorSubscription subscription, {required SampleRate rate,}) async {
-    this.subscription = subscription;
+    _subscription = subscription;
     return GyroscopePlatform.instance.subscribe(rate);
   }
 
-  void startListeningToGyroscopeData() {
-    _streamSubscription = _eventChannel.receiveBroadcastStream().listen((dynamic data) {
-      GyroscopeData gyroData = GyroscopeData(azimuth: data[0], pitch: data[1], roll: data[2]);
-      if (subscription!= null) {
-        subscription!(gyroData);
-      }
-    }, onError: (dynamic error) {
-      // Handle any errors that occur during the stream
-    });
+  void setupEventChannel() {
+    _streamSubscription = _eventChannel.receiveBroadcastStream().listen(onEventReceived, onError: onEventChannelError);
   }
 
   @override
   Future<void> unsubscribe() async {
-    stopListeningToGyroscope();
     GyroscopePlatform.instance.unsubscribe();
   }
 
-  void stopListeningToGyroscope(){
+  void onEventReceived(dynamic data) {
+    try {
+      GyroscopeData gyroData = GyroscopeData(azimuth: data[0], pitch: data[1], roll: data[2]);
+      if (_subscription != null) {
+        _subscription!(gyroData);
+      }
+    }catch (error){
+      print('there was a problem parsing the sensor data: $error');
+    }
+  }
+
+  void onEventChannelError(dynamic error){
+
 
   }
+
 
 }

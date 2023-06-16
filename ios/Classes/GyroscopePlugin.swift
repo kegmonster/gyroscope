@@ -25,6 +25,11 @@ public class GyroscopePlugin: NSObject, FlutterPlugin, FlutterStreamHandler {
             let rate = (call.arguments as! [String:Any])["rate"]
             if (eventSink != nil){
                 gyroscopeHandler.startListening(rate: rate as! UInt, eventSink: eventSink!)
+                result(true)
+            }
+            else{
+                print("eventChannel not ready")
+                result(false)
             }
             break
         case "unsubscribe":

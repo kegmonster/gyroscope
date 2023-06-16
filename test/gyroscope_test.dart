@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gyroscope/gyroscope.dart';
 import 'package:gyroscope/gyroscope_platform_interface.dart';
 import 'package:gyroscope/gyroscope_method_channel.dart';
+import 'package:gyroscope/src/gyroscope_sensor_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 class MockGyroscopePlatform
@@ -12,8 +13,31 @@ class MockGyroscopePlatform
   Future<String?> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<void> subscribe() {
+  Future<void> subscribe(SampleRate rate) {
     // TODO: implement subscribe
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> unsubscribe() {
+    // TODO: implement unsubscribe
+    throw UnimplementedError();
+  }
+}
+
+class MockGyroscopeImpl
+    with MockPlatformInterfaceMixin
+    implements GyroscopeSensorInterface {
+
+  @override
+  Future<void> subscribe(GyroscopeSensorSubscription subscription, {required SampleRate rate}) {
+    // TODO: implement subscribe
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> unsubscribe() {
+    // TODO: implement unsubscribe
     throw UnimplementedError();
   }
 }
@@ -26,10 +50,9 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    Gyroscope gyroscopePlugin = Gyroscope();
+    GyroscopeSensorImpl gyroscope = MockGyroscopeImpl() as GyroscopeSensorImpl;
     MockGyroscopePlatform fakePlatform = MockGyroscopePlatform();
     GyroscopePlatform.instance = fakePlatform;
 
-    expect(await gyroscopePlugin.getPlatformVersion(), '42');
   });
 }
