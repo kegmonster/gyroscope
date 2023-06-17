@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'dart:math' as math;
 
 class GyroscopeData extends Equatable{
 // Rotation on the axis from the back to the front side of the phone
@@ -13,6 +14,10 @@ class GyroscopeData extends Equatable{
     required this.pitch,
     required this.roll,
   });
+
+  static double toDegrees(double radians){
+    return radians * (180 / math.pi);
+  }
 
   @override
   List<Object> get props => [azimuth, pitch, roll];

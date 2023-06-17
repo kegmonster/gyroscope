@@ -10,6 +10,7 @@ class GyroscopeSensorImpl implements GyroscopeSensorInterface {
   final EventChannel _eventChannel = const EventChannel('gyro_update_channel');
   StreamSubscription<dynamic>? _streamSubscription;
   GyroscopeSensorSubscription? _subscription;
+  GyroscopeData gyroData = const GyroscopeData(azimuth: 0, pitch: 0, roll: 0);
 
   GyroscopeSensorImpl(){
     setupEventChannel();
@@ -18,7 +19,7 @@ class GyroscopeSensorImpl implements GyroscopeSensorInterface {
   @override
   Future<void> subscribe(GyroscopeSensorSubscription subscription, {required SampleRate rate,}) async {
     _subscription = subscription;
-    return GyroscopePlatform.instance.subscribe(rate);
+    return GyroscopePlatform.instance.subscribe(SampleRate.normal);
   }
 
   void setupEventChannel() {
@@ -28,13 +29,14 @@ class GyroscopeSensorImpl implements GyroscopeSensorInterface {
   @override
   Future<void> unsubscribe() async {
     GyroscopePlatform.instance.unsubscribe();
+    gyroData = const GyroscopeData(azimuth: 0, pitch: 0, roll: 0);
   }
 
   void onEventReceived(dynamic data) {
     try {
-      GyroscopeData gyroData = GyroscopeData(azimuth: data[0], pitch: data[1], roll: data[2]);
+      GyroscopeData gyroscopeData = GyroscopeData(azimuth: data[2], pitch: data[0], roll: data[1]);
       if (_subscription != null) {
-        _subscription!(gyroData);
+        _subscription!(gyroscopeData);
       }
     }catch (error){
       print('there was a problem parsing the sensor data: $error');

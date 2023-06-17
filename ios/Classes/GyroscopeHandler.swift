@@ -7,58 +7,76 @@
 
 import Foundation
 import Flutter
-import SensingKit
+import CoreMotion
 
 class GyroscopeHandler: NSObject {
 
     private var eventSink: FlutterEventSink?
-    private var sensingKit: SensingKitLib?
+   // private var sensingKit: SensingKitLib?
+    private let motionManager = CMMotionManager()
+    private var initialOrientation: CMRotationRate?
+    private var lastTimestamp: TimeInterval = 0
+        private var currentPitch: Double = 0
+        private var currentRoll: Double = 0
+        private var currentYaw: Double = 0
     
     
     override init() {
         super.init()
-        sensingKit = SensingKitLib.shared()
     }
 
     func startListening(rate: UInt, eventSink: @escaping FlutterEventSink) {
         self.eventSink = eventSink
-        do{
-            let config = SKGyroscopeConfiguration()
-            config.sampleRate = rate
-            try sensingKit?.register(SKSensorType.Gyroscope,with: config)
-            try sensingKit?.subscribe(to: SKSensorType.Gyroscope, withHandler: { (sensorType, sensorData, error) in
+        
+        if motionManager.isDeviceMotionAvailable {
+            motionManager.deviceMotionUpdateInterval = TimeInterval(1/rate) // Update interval in seconds
+            
+            motionManager.startDeviceMotionUpdates(to: OperationQueue.main) { [weak self] (gyroData, error) in
+                guard let self = self else { return }
                 
                 if let error = error {
-                    // Handle the error
+                    // Handle error if needed
                     print("Gyroscope sensor error: \(error.localizedDescription)")
                     return
                 }
                 
-                if let data = sensorData as? SKGyroscopeData {
-                    // Handle gyroscope data
-                    let x = data.rotationRate.x
-                    let y = data.rotationRate.y
-                    let z = data.rotationRate.z
-                    
-                    // Send the gyroscope data to Flutter
-                    let gyroscopeData = [x, y, z]
-                    self.eventSink?(gyroscopeData)
+                if let rotationRate = gyroData?.rotationRate {
+                    if (self.lastTimestamp == 0){
+                        self.lastTimestamp = gyroData!.timestamp
+                    }
+                    else{
+                        let timestamp = gyroData!.timestamp
+                        
+                        // Calculate the time elapsed since the last gyroscope data
+                        let deltaTime = timestamp - self.lastTimestamp
+                        
+                        // Integrate the rotation rate to get the change in angles
+                        let deltaPitch = rotationRate.x * deltaTime
+                        let deltaRoll = rotationRate.y * deltaTime
+                        let deltaYaw = rotationRate.z * deltaTime
+                        
+                        // Update the current orientation angles
+                        self.currentPitch += deltaPitch
+                        self.currentRoll += deltaRoll
+                        self.currentYaw += deltaYaw
+                        
+                        // Send the current orientation angles to Flutter
+                        self.eventSink?([self.currentPitch, self.currentRoll, self.currentYaw])
+                        
+                        // Update the last timestamp
+                        self.lastTimestamp = timestamp
+                    }
                 }
-                
-            })
-            try sensingKit?.startContinuousSensing(with: SKSensorType.Gyroscope)
-        }catch{
-            
+            }
         }
-
+        
     }
 
     func stopListening() {
-        do{
-            try sensingKit?.startContinuousSensing(with: SKSensorType.Gyroscope)
-        }catch{
-            
-        }
+        motionManager.stopGyroUpdates()
+        currentYaw = 0
+        currentRoll = 0
+        currentPitch = 0
         eventSink = nil
     }
 
