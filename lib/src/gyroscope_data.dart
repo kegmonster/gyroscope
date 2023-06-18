@@ -19,6 +19,21 @@ class GyroscopeData extends Equatable{
     return radians * (180 / math.pi);
   }
 
+  GyroscopeData operator -(GyroscopeData other){
+    return GyroscopeData(
+        azimuth: azimuth - other.azimuth,
+        pitch: pitch - other.pitch,
+        roll: roll - other.roll);
+  }
+
+  GyroscopeData operator +(GyroscopeData other){
+    return GyroscopeData(
+        azimuth: azimuth + other.azimuth,
+        pitch: pitch + other.pitch,
+        roll: roll + other.roll);
+  }
+
+
   @override
   List<Object> get props => [azimuth, pitch, roll];
 }

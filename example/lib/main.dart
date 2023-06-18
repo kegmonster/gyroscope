@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gyroscope/gyroscope.dart';
-import 'package:gyroscope_example/gyro_provider.dart';
 import 'package:gyroscope_example/gyro_widget.dart';
 
 void main() {
@@ -28,7 +26,7 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
+        body: const Center(
           child: GyroWidget(),
         ),
       ),

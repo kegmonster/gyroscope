@@ -12,13 +12,12 @@ import CoreMotion
 class GyroscopeHandler: NSObject {
 
     private var eventSink: FlutterEventSink?
-   // private var sensingKit: SensingKitLib?
     private let motionManager = CMMotionManager()
     private var initialOrientation: CMRotationRate?
     private var lastTimestamp: TimeInterval = 0
-        private var currentPitch: Double = 0
-        private var currentRoll: Double = 0
-        private var currentYaw: Double = 0
+    private var currentPitch: Double = 0
+    private var currentRoll: Double = 0
+    private var currentYaw: Double = 0
     
     
     override init() {
@@ -28,8 +27,8 @@ class GyroscopeHandler: NSObject {
     func startListening(rate: UInt, eventSink: @escaping FlutterEventSink) {
         self.eventSink = eventSink
         
-        if motionManager.isDeviceMotionAvailable {
-            motionManager.deviceMotionUpdateInterval = TimeInterval(1/rate) // Update interval in seconds
+        if motionManager.isGyroAvailable {
+            motionManager.gyroUpdateInterval = TimeInterval(1/rate) // Update interval in seconds
             
             motionManager.startDeviceMotionUpdates(to: OperationQueue.main) { [weak self] (gyroData, error) in
                 guard let self = self else { return }
@@ -47,18 +46,23 @@ class GyroscopeHandler: NSObject {
                     else{
                         let timestamp = gyroData!.timestamp
                         
-                        // Calculate the time elapsed since the last gyroscope data
+                        // calculate the time elapsed since the last gyroscope data
                         let deltaTime = timestamp - self.lastTimestamp
                         
-                        // Integrate the rotation rate to get the change in angles
+                        // integrate the rotation rate to get the change in angles
                         let deltaPitch = rotationRate.x * deltaTime
                         let deltaRoll = rotationRate.y * deltaTime
                         let deltaYaw = rotationRate.z * deltaTime
                         
-                        // Update the current orientation angles
+                        // update the current orientation angles
                         self.currentPitch += deltaPitch
                         self.currentRoll += deltaRoll
                         self.currentYaw += deltaYaw
+        
+                        //normalize
+                        self.currentPitch = self.normalizeAngle(self.currentPitch)
+                        self.currentRoll = self.normalizeAngle(self.currentRoll)
+                        self.currentYaw = self.normalizeAngle(self.currentYaw)
                         
                         // Send the current orientation angles to Flutter
                         self.eventSink?([self.currentPitch, self.currentRoll, self.currentYaw])
@@ -70,6 +74,21 @@ class GyroscopeHandler: NSObject {
             }
         }
         
+    }
+    
+    func normalizeAngle(_ angle: Double) -> Double {
+        var normalizedAngle = angle
+        
+        // Normalize the angle
+        while normalizedAngle <= -Double.pi {
+            normalizedAngle += (2 * Double.pi)
+        }
+        
+        while normalizedAngle > Double.pi {
+            normalizedAngle -= (2 * Double.pi)
+        }
+        
+        return normalizedAngle
     }
 
     func stopListening() {
