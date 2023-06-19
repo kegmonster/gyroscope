@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gyroscope/gyroscope.dart';
 import 'package:gyroscope_example/game_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -94,9 +95,9 @@ class _GyroWidgetState extends State<GyroWidget> {
   Widget debugValues(){
     return Column(
       children: [
-        debugValueRow('Pitch', game.debugValues.pitch),
-        debugValueRow('Roll', game.debugValues.roll),
-        debugValueRow('Azimuth', game.debugValues.azimuth),
+        debugValueRow('Pitch', GyroscopeData.toDegrees(game.debugValues.pitch)),
+        debugValueRow('Roll', GyroscopeData.toDegrees(game.debugValues.roll)),
+        debugValueRow('Azimuth', GyroscopeData.toDegrees(game.debugValues.azimuth)),
       ],
     );
   }
