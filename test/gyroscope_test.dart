@@ -32,13 +32,13 @@ class MockGyroscopeImpl
   @override
   Future<void> subscribe(GyroscopeSensorSubscription subscription, {required SampleRate rate}) {
     // TODO: implement subscribe
-    throw UnimplementedError();
+    throw SensorException();
   }
 
   @override
   Future<void> unsubscribe() {
     // TODO: implement unsubscribe
-    throw UnimplementedError();
+    throw SensorException();
   }
 }
 
@@ -50,9 +50,9 @@ void main() {
   });
 
   test('getPlatformVersion', () async {
-    GyroscopeSensorImpl gyroscope = MockGyroscopeImpl() as GyroscopeSensorImpl;
+    MockGyroscopeImpl gyroscopeImpl = MockGyroscopeImpl();
     MockGyroscopePlatform fakePlatform = MockGyroscopePlatform();
     GyroscopePlatform.instance = fakePlatform;
-
+    expect(() => gyroscopeImpl.subscribe((data) => null, rate: SampleRate.normal), throwsA(TypeMatcher<SensorException>()));
   });
 }

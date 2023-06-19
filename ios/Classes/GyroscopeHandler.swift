@@ -13,12 +13,11 @@ class GyroscopeHandler: NSObject {
 
     private var eventSink: FlutterEventSink?
     private let motionManager = CMMotionManager()
-    private var initialOrientation: CMRotationRate?
     private var lastTimestamp: TimeInterval = 0
     private var currentPitch: Double = 0
     private var currentRoll: Double = 0
     private var currentYaw: Double = 0
-    
+
     
     override init() {
         super.init()
@@ -79,11 +78,9 @@ class GyroscopeHandler: NSObject {
     func normalizeAngle(_ angle: Double) -> Double {
         var normalizedAngle = angle
         
-        // Normalize the angle
         while normalizedAngle <= -Double.pi {
             normalizedAngle += (2 * Double.pi)
         }
-        
         while normalizedAngle > Double.pi {
             normalizedAngle -= (2 * Double.pi)
         }

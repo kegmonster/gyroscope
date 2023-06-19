@@ -34,7 +34,7 @@ class GyroscopeSensorImpl implements GyroscopeSensorInterface {
 
   void onEventReceived(dynamic data) {
     try {
-      GyroscopeData gyroscopeData = GyroscopeData(azimuth: data[2], pitch: data[0], roll: data[1]);
+      GyroscopeData gyroscopeData = GyroscopeData(pitch: data[0], roll: data[1], azimuth: data[2]);
       if (_subscription != null) {
         _subscription!(gyroscopeData);
       }
@@ -44,7 +44,7 @@ class GyroscopeSensorImpl implements GyroscopeSensorInterface {
   }
 
   void onEventChannelError(dynamic error){
-
+    print('Error on the event channel' + error);
 
   }
 

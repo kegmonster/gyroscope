@@ -7,7 +7,6 @@ class MyGyro with ChangeNotifier{
   static MyGyro? _myGyro;
   GyroscopeData gyroData = const GyroscopeData(azimuth: 0, pitch: 0, roll: 0);
 
-
   static MyGyro get instance => _myGyro ?? MyGyro._();
 
   MyGyro._();
