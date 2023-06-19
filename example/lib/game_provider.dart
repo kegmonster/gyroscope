@@ -5,7 +5,7 @@ import 'dart:math' as math;
 
 class GameProvider with ChangeNotifier{
 
-  Color _target = const Color.fromARGB(255,100,0,0);
+  final Color _target = const Color.fromARGB(255,48,125,255);
   GameOver onGameOver;
   int _difficultyOffset = 10;
   bool _running = false;
@@ -34,10 +34,10 @@ class GameProvider with ChangeNotifier{
   }
 
 
-  start(){
+  start(SampleRate rate){
     _running = true;
     startTime = DateTime.now();
-    _myGyro.subscribe();
+    _myGyro.subscribe(rate);
     notifyListeners();
   }
 

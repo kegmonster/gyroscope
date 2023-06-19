@@ -11,11 +11,11 @@ class MyGyro with ChangeNotifier{
 
   MyGyro._();
 
-  Future<void> subscribe() async {
+  Future<void> subscribe(SampleRate rate) async {
     await _gyroSensor.subscribe((data) {
       gyroData = data;
       notifyListeners();
-    }, rate: SampleRate.normal);
+    }, rate: rate);
   }
 
   Future<void> unsubscribe() async {

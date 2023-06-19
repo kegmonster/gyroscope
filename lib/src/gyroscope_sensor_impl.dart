@@ -19,7 +19,7 @@ class GyroscopeSensorImpl implements GyroscopeSensorInterface {
   @override
   Future<void> subscribe(GyroscopeSensorSubscription subscription, {required SampleRate rate,}) async {
     _subscription = subscription;
-    return GyroscopePlatform.instance.subscribe(SampleRate.normal);
+    return GyroscopePlatform.instance.subscribe(rate);
   }
 
   void setupEventChannel() {
